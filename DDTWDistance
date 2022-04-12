@@ -1,0 +1,33 @@
+from math import sqrt
+
+def derivative(s1):
+    A = {}
+    for i in range(len(s1)):
+        if i == 0:
+            A[i] = s1[i + 1] - s1[i]
+        elif i == len(s1) - 1:
+            A[i] = s1[i] - s1[i-1]
+        else:
+            A[i] = ((s1[i] - s1[i - 1]) + ((s1[i + 1] - s1[i - 1]) / 2)) / 2
+
+    A = preprocessing.scale(list(A.values()))
+
+    return A
+
+def DDTWDistance(s1, s2):
+    DDTW = {}
+    s1 = derivative(s1)
+    s2 = derivative(s2)
+
+    for i in range(len(s1)):
+        DDTW[(i, -1)] = float('inf')
+    for i in range(len(s2)):
+        DDTW[(-1, i)] = float('inf')
+    DDTW[(-1, -1)] = 0
+
+    for i in range(len(s1)):
+        for j in range(len(s2)):
+            dist = (s1[i] - s2[j]) ** 2
+            DDTW[(i, j)] = dist + min(DDTW[(i - 1, j)], DDTW[(i, j - 1)], DDTW[(i - 1, j - 1)])
+
+    return sqrt(DDTW[len(s1) - 1, len(s2) - 1])
